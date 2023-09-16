@@ -15,7 +15,7 @@ namespace Shamazon.Controllers
 
         public IActionResult Index()
         {
-            return View();
+            return View(); //Since no View() is defined, it is taken from the method name "Index" -> Index.cshtml
         }
 
         public IActionResult Privacy()

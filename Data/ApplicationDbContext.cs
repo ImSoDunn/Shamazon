@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Shamazon.Models;
 
 namespace Shamazon.Data
 {
@@ -9,5 +10,6 @@ namespace Shamazon.Data
             : base(options)
         {
         }
+        public DbSet<Shamazon.Models.Item>? Item { get; set; }
     }
 }
