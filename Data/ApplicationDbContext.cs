@@ -11,5 +11,6 @@ namespace Shamazon.Data
         {
         }
         public DbSet<Shamazon.Models.Item>? Item { get; set; }
+        public DbSet<Shamazon.Models.ShoppingCart>? ShoppingCart { get; set; }
     }
 }

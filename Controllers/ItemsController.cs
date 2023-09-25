@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using Shamazon.Data;
 using Shamazon.Models;
 
@@ -24,7 +26,7 @@ namespace Shamazon.Controllers
         {
               return _context.Item != null ? 
                           View(await _context.Item.ToListAsync()) :
-                          Problem("Entity set 'ApplicationDbContext.Item'  is null.");
+                          Problem("Entity set 'ApplicationDbContext.Item' is null.");
         }
 
         // GET: Items/Details/5
@@ -46,6 +48,7 @@ namespace Shamazon.Controllers
         }
 
         // GET: Items/Create
+        [Authorize]
         public IActionResult Create()
         {
             return View();
@@ -54,6 +57,7 @@ namespace Shamazon.Controllers
         // POST: Items/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,ItemName,ItemDescription, ItemExtendedDescription, ItemPrice")] Item item)
@@ -67,7 +71,58 @@ namespace Shamazon.Controllers
             return View(item);
         }
 
+        // GET: Items/AddToCart
+        [Authorize]
+        public IActionResult AddToCart()
+        {
+            return View();
+        }
+
+        // POST: Items/AddToCart
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddToCart(int id)
+        {
+            var item = await _context.Item.FindAsync(id);
+            if (item == null)
+            {
+                return NotFound();
+            }
+
+            //Checks to see if item exists in Shopping Cart
+            var existingCarItem = await _context.ShoppingCart.FirstOrDefaultAsync(c => c.Id == id);
+
+            //If Item already exists then update quantity
+            if (existingCarItem != null)
+            {
+                existingCarItem.ItemQuantity++;
+                _context.ShoppingCart.Update(existingCarItem);
+            }
+            //Else create new item
+            else
+            {
+                var cartItem = new ShoppingCart
+                {
+                    Id = item.Id,
+                    ItemName = item.ItemName,
+                    ItemDescription = item.ItemDescription,
+                    ItemPrice = item.ItemPrice,
+                    ItemQuantity = 1
+                };
+
+                _context.ShoppingCart.Add(cartItem);
+            }
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index)); 
+        }
+
+
         // GET: Items/Edit/5
+        [Authorize]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null || _context.Item == null)
@@ -88,6 +143,7 @@ namespace Shamazon.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize]
         public async Task<IActionResult> Edit(int id, [Bind("Id,ItemName,ItemDescription,ItemPrice")] Item item)
         {
             if (id != item.Id)
@@ -119,6 +175,7 @@ namespace Shamazon.Controllers
         }
 
         // GET: Items/Delete/5
+        [Authorize]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null || _context.Item == null)
@@ -139,6 +196,7 @@ namespace Shamazon.Controllers
         // POST: Items/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             if (_context.Item == null)
