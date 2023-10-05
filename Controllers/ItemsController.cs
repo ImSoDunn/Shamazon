@@ -71,6 +71,7 @@ namespace Shamazon.Controllers
             return View(item);
         }
 
+        
         // GET: Items/AddToCart
         [Authorize]
         public IActionResult AddToCart()
@@ -119,6 +120,7 @@ namespace Shamazon.Controllers
 
             return RedirectToAction(nameof(Index)); 
         }
+        
 
 
         // GET: Items/Edit/5
