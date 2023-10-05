@@ -53,6 +53,9 @@
                 <form asp-action="AddToCart" asp-route-id="@item.Id" method="post">
                         <button type="submit" class="btn btn-primary">Add To Cart</button>
                 </form>
+                    <form asp-action="AddToWishList" asp-route-id="@item.Id" method="post">
+                        <button type="submit" class="btn btn-primary">Add To WishList</button>
+                    </form>
                 <!-- <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>-->
             </td>
         </tr>

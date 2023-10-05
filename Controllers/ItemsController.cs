@@ -5,9 +5,11 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Shamazon.Data;
+using Shamazon.Data.Migrations;
 using Shamazon.Models;
 
 namespace Shamazon.Controllers
@@ -71,14 +73,12 @@ namespace Shamazon.Controllers
             return View(item);
         }
 
-        
+
         // GET: Items/AddToCart
-        [Authorize]
         public IActionResult AddToCart()
         {
             return View();
         }
-
         // POST: Items/AddToCart
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
@@ -118,9 +118,56 @@ namespace Shamazon.Controllers
             }
             await _context.SaveChangesAsync();
 
-            return RedirectToAction(nameof(Index)); 
+            return RedirectToAction(nameof(Index));
         }
-        
+
+        // GET: Items/AddToWishList
+        public IActionResult AddToWishList()
+        {
+            return View();
+        }
+        // POST: Items/AddToWishList
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddToWishList(int id)
+        {
+            var item = await _context.Item.FindAsync(id);
+            if (item == null)
+            {
+                return NotFound();
+            }
+
+            //Checks to see if item exists in Shopping Cart
+            var existingCarItem = await _context.WishList.FirstOrDefaultAsync(c => c.Id == id);
+
+            //If Item already exists then update quantity
+            if (existingCarItem != null)
+            {
+                
+            }
+            //Else create new item
+            else
+            {
+                var WishItem = new WishList
+                {
+                    Id = item.Id,
+                    ItemName = item.ItemName,
+                    ItemDescription = item.ItemDescription,
+                    ItemPrice = item.ItemPrice,
+                    ItemExtendedDescription = item.ItemExtendedDescription,
+                    ItemQuantity = 1
+                };
+
+                _context.WishList.Add(WishItem);
+            }
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index));
+        }
+
 
 
         // GET: Items/Edit/5
