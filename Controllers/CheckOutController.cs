@@ -11,6 +11,7 @@ namespace Shamazon.Controllers
             return View();
         }
 
+        /*
         // GET: CheckOutController/Details/5
         public ActionResult Details(int id)
         {
@@ -79,5 +80,6 @@ namespace Shamazon.Controllers
                 return View();
             }
         }
+        */
     }
 }
