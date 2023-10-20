@@ -69,8 +69,18 @@ namespace Shamazon.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult CheckOut()
         {
+
+            var removeItems = _context.ShoppingCart.ToList();
+
+            if (removeItems.Count > 0)
+            {
+                _context.ShoppingCart.RemoveRange(removeItems);
+                _context.SaveChanges();
+            }
+
             return RedirectToAction("Index", "CheckOut");
         }
+
 
 
 
